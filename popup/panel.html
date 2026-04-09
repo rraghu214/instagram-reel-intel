@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reel Intel</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Screen: Not on Instagram
+════════════════════════════════════════════════════════════════ -->
+<div id="screen-offsite" class="screen hidden">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="logo"><div class="logo-dot"></div>Reel Intel</div>
+    </div>
+    <div class="panel-body panel-center">
+      <div class="icon-xl">📍</div>
+      <p class="empty-title">Open Instagram first</p>
+      <p class="empty-sub">Navigate to an Instagram Reel, post, or story, then click the extension.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Screen: No API key
+════════════════════════════════════════════════════════════════ -->
+<div id="screen-nokey" class="screen hidden">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="logo"><div class="logo-dot"></div>Reel Intel</div>
+    </div>
+    <div class="panel-body panel-center">
+      <div class="icon-xl">🔑</div>
+      <p class="empty-title">Setup required</p>
+      <p class="empty-sub">Add a Gemini API key (free) or Claude API key to get started with video analysis.</p>
+      <button class="btn primary mt12" id="btn-open-settings">Open Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     Screen: Main panel
+════════════════════════════════════════════════════════════════ -->
+<div id="screen-main" class="screen hidden">
+  <div class="panel">
+
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="logo"><div class="logo-dot"></div>Reel Intel</div>
+      <div class="header-right">
+        <button class="icon-btn" id="btn-refresh" title="Re-analyse">↺</button>
+        <button class="icon-btn" id="btn-settings" title="Settings">⚙</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mode-tabs">
+      <button class="tab active" data-tab="location">Location</button>
+      <button class="tab"        data-tab="ask">Ask anything</button>
+    </div>
+
+    <!-- ─── Location Pane ──────────────────────────────────── -->
+    <div id="pane-location" class="pane">
+
+      <!-- Loading -->
+      <div id="loc-loading" class="panel-body">
+        <div class="loading-wrap">
+          <div class="spinner"></div>
+          <div id="load-title" class="load-title">Analyzing video...</div>
+          <div id="load-sub"   class="load-sub">Reading signals</div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="loc-result" class="panel-body hidden">
+        <div id="warn-banner" class="banner hidden"></div>
+
+        <div id="signal-rows"></div>
+
+        <div id="result-card" class="result-card hidden">
+          <div id="result-name" class="result-place"></div>
+          <div id="result-sub"  class="result-sub"></div>
+          <div class="conf-wrap">
+            <div class="conf-labels">
+              <span>Confidence</span>
+              <span id="conf-pct">—</span>
+            </div>
+            <div class="conf-bar">
+              <div id="conf-fill" class="conf-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn"         id="btn-maps">Open in Maps</button>
+          <button class="btn primary" id="btn-similar">Similar places ↗</button>
+        </div>
+
+        <button class="deep-btn hidden" id="btn-deep">🔍 Run deep analysis</button>
+      </div>
+
+      <!-- Deep analysis in progress -->
+      <div id="loc-deep" class="panel-body hidden">
+        <div class="loading-wrap">
+          <div class="spinner"></div>
+          <div class="load-title">Running deep analysis...</div>
+          <div class="load-sub">Sampling all frames · transcribing audio</div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="loc-error" class="panel-body hidden">
+        <div class="error-box" id="error-msg"></div>
+        <button class="btn primary mt12 full-width" id="btn-retry">Retry</button>
+      </div>
+
+    </div><!-- /pane-location -->
+
+    <!-- ─── Ask Anything Pane ──────────────────────────────── -->
+    <div id="pane-ask" class="pane hidden">
+      <div class="ask-panel">
+
+        <!-- Idle / intro -->
+        <div id="ask-idle">
+          <p class="ask-idle-text">Ask anything about this video — location, products, music, recipes, crowd vibe, and more.</p>
+        </div>
+
+        <!-- Answer -->
+        <div id="ask-answer-wrap" class="hidden">
+          <div class="answer-label">Answer</div>
+          <div class="answer-box" id="ask-answer"></div>
+          <div id="ask-products" class="hidden"></div>
+        </div>
+
+        <!-- Loading -->
+        <div id="ask-loading" class="hidden">
+          <div class="loading-wrap compact">
+            <div class="spinner sm"></div>
+            <span class="load-sub">Thinking...</span>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-wrap">
+          <textarea id="ask-input" class="ask-input" placeholder="Ask anything about this video..." rows="2"></textarea>
+          <button class="send-btn" id="btn-send">→</button>
+        </div>
+
+        <!-- Suggestion chips -->
+        <div class="chips" id="chips">
+          <button class="chip" data-q="Where is this place?">Where is this?</button>
+          <button class="chip" data-q="What song is playing?">What song is playing?</button>
+          <button class="chip" data-q="What camera or lens was used to film this?">Camera used?</button>
+          <button class="chip" data-q="Give me the full recipe shown in this video with ingredients and steps.">Recipe?</button>
+          <button class="chip" data-q="What clothing or products can I buy that are shown in this video?">Products shown?</button>
+          <button class="chip" data-q="How crowded is this place? What is the vibe like?">Crowd &amp; vibe?</button>
+        </div>
+
+      </div>
+    </div><!-- /pane-ask -->
+
+  </div><!-- /panel -->
+</div><!-- /screen-main -->
+
+<script src="panel.js"></script>
+</body>
+</html>

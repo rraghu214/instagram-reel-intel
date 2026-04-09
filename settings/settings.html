@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reel Intel — Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="logo"><div class="logo-dot"></div>Reel Intel</div>
+      <div class="page-subtitle">Settings</div>
+    </div>
+
+    <!-- API Keys -->
+    <section class="card">
+      <div class="card-title">API Keys</div>
+      <p class="card-desc">Keys are stored locally in your browser using <code>chrome.storage.sync</code> and are never sent to any server other than the respective API provider.</p>
+
+      <!-- Gemini -->
+      <div class="field">
+        <label for="gemini-key">
+          Google Gemini API Key
+          <span class="badge free">Free</span>
+          <span class="badge recommended">Recommended</span>
+        </label>
+        <div class="input-row">
+          <input type="password" id="gemini-key" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
+          <button class="test-btn" id="test-gemini">Test</button>
+        </div>
+        <p class="field-hint">Powers all frame analysis and Ask anything using <strong>Gemini 2.5 Flash</strong> — free tier includes 1,500 requests/day, no billing required. Get your key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> — click <strong>"Create API key in new project"</strong> to get the full free quota (existing Cloud project keys have much lower limits).</p>
+        <div class="field-status" id="status-gemini"></div>
+      </div>
+
+      <!-- Claude -->
+      <div class="field">
+        <label for="claude-key">
+          Claude API Key
+          <span class="badge optional">Optional fallback</span>
+        </label>
+        <div class="input-row">
+          <input type="password" id="claude-key" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+          <button class="test-btn" id="test-claude">Test</button>
+        </div>
+        <p class="field-hint">Used as a fallback if Gemini is unavailable or unset. Requires credits at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. At least one of Gemini or Claude is required.</p>
+        <div class="field-status" id="status-claude"></div>
+      </div>
+
+      <!-- OpenAI -->
+      <div class="field">
+        <label for="openai-key">
+          OpenAI API Key
+          <span class="badge optional">Optional</span>
+        </label>
+        <div class="input-row">
+          <input type="password" id="openai-key" placeholder="sk-proj-..." autocomplete="off" spellcheck="false">
+          <button class="test-btn" id="test-openai">Test</button>
+        </div>
+        <p class="field-hint">Enables audio transcription via Whisper — improves location detection from spoken place names. Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>.</p>
+        <div class="field-status" id="status-openai"></div>
+      </div>
+
+      <!-- Google Maps -->
+      <div class="field">
+        <label for="maps-key">
+          Google Maps API Key
+          <span class="badge optional">Optional</span>
+        </label>
+        <div class="input-row">
+          <input type="password" id="maps-key" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
+          <button class="test-btn" id="test-maps">Test</button>
+        </div>
+        <p class="field-hint">Powers the "Similar places" feature and direct place ID deep-links. Without it, Similar places opens a Google Maps search. Enable <strong>Places API</strong> for your key at <a href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a>.</p>
+        <div class="field-status" id="status-maps"></div>
+      </div>
+    </section>
+
+    <!-- Analysis Settings -->
+    <section class="card">
+      <div class="card-title">Analysis Settings</div>
+
+      <div class="field">
+        <label for="conf-threshold">Confidence threshold</label>
+        <div class="input-row tight">
+          <input type="range" id="conf-range" min="50" max="95" step="5" value="80">
+          <input type="number" id="conf-threshold" min="50" max="95" step="5" value="80">
+          <span class="unit">%</span>
+        </div>
+        <p class="field-hint">
+          Stop sampling more frames once this confidence level is reached. Lower = faster but may miss the exact location. Higher = more frames analysed before showing a result.
+          <br><strong>Default: 80%</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- Save row -->
+    <div class="save-row">
+      <button class="btn-save" id="btn-save">Save settings</button>
+      <div class="save-feedback" id="save-feedback"></div>
+    </div>
+
+    <!-- About -->
+    <p class="about">Reel Intel v1.0 · Frames analyzed using <a href="https://www.anthropic.com" target="_blank" rel="noopener">Claude</a> vision · Audio via <a href="https://openai.com/research/whisper" target="_blank" rel="noopener">Whisper</a></p>
+
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

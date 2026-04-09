@@ -1,0 +1,204 @@
+/* settings.css — Reel Intel settings page */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 28px 20px;
+  color: #111;
+  font-size: 14px;
+}
+
+.container { max-width: 520px; margin: 0 auto; }
+
+/* ── Page header ──────────────────────────────────────────────────── */
+.page-header { margin-bottom: 22px; }
+
+.logo {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7F77DD;
+  flex-shrink: 0;
+}
+.page-subtitle {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+  margin-left: 18px;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 6px;
+}
+.card-desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+code {
+  background: #f0f0f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+}
+
+/* ── Fields ───────────────────────────────────────────────────────── */
+.field { margin-bottom: 20px; }
+.field:last-child { margin-bottom: 0; }
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 10px;
+  line-height: 1;
+}
+.badge.required     { background: #FEE2E2; color: #B91C1C; }
+.badge.optional     { background: #F0F0F0; color: #666; }
+.badge.free         { background: #D1FAE5; color: #065F46; }
+.badge.recommended  { background: #EEF2FF; color: #3730A3; }
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.input-row.tight { gap: 6px; }
+
+input[type="password"],
+input[type="number"],
+input[type="text"] {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  border: 0.5px solid #ddd;
+  border-radius: 8px;
+  background: #f8f8f8;
+  color: #111;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+input[type="password"]:focus,
+input[type="number"]:focus { border-color: #AFA9EC; background: #fff; }
+
+input[type="number"] { max-width: 64px; flex: none; }
+
+input[type="range"] {
+  flex: 1;
+  accent-color: #7F77DD;
+  cursor: pointer;
+}
+
+.unit { font-size: 12px; color: #888; flex-shrink: 0; }
+
+.test-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  border: 0.5px solid #ddd;
+  border-radius: 8px;
+  background: #f8f8f8;
+  color: #444;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.test-btn:hover    { background: #eee; }
+.test-btn:disabled { opacity: 0.5; cursor: default; }
+
+.field-hint {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.55;
+  margin-top: 6px;
+}
+.field-hint a        { color: #185FA5; text-decoration: none; }
+.field-hint a:hover  { text-decoration: underline; }
+.field-hint strong   { color: #555; }
+
+.field-status {
+  font-size: 11px;
+  margin-top: 5px;
+  min-height: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.field-status.ok      { color: #1D9E75; }
+.field-status.err     { color: #C53030; }
+.field-status.testing { color: #888; }
+
+/* ── Save row ─────────────────────────────────────────────────────── */
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.btn-save {
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background: #7F77DD;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+.btn-save:hover { background: #6B62CC; }
+
+.save-feedback {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  transition: color 0.2s;
+}
+.save-feedback.ok { color: #1D9E75; }
+
+/* ── About ────────────────────────────────────────────────────────── */
+.about {
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 20px;
+  text-align: center;
+  line-height: 1.5;
+}
+.about a        { color: #aaa; text-decoration: none; }
+.about a:hover  { color: #888; }
