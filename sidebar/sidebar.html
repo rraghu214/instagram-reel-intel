@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reel Intel</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     Fixed header
+═══════════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span class="logo-text">Reel Intel</span>
+    <span id="model-badge" class="model-badge hidden"></span>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btn-refresh" title="Re-analyze">↺</button>
+    <button class="icon-btn" id="btn-settings" title="Settings">⚙</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     Analysis section  (shown only on Instagram reel/post/story)
+═══════════════════════════════════════════════════════════ -->
+<div id="analysis-section" class="analysis-section hidden">
+
+  <!-- No-key notice -->
+  <div id="nokey-notice" class="notice-strip notice-warn hidden">
+    🔑 Add a Gemini or Claude API key in
+    <button class="inline-btn" id="btn-settings-notice">Settings</button>
+    to analyze Reels.
+  </div>
+
+  <!-- Cached result banner -->
+  <div id="cached-banner" class="notice-strip notice-info hidden">
+    <span id="cached-banner-text"></span>
+    <button class="inline-btn" id="btn-reanalyze">Re-analyze</button>
+  </div>
+
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <button class="tab active" data-tab="location">Location</button>
+    <button class="tab"        data-tab="ask">Ask anything</button>
+  </div>
+
+  <!-- ─── Location Pane ──────────────────────────────────── -->
+  <div id="pane-location" class="pane">
+
+    <!-- Idle / waiting for user to trigger -->
+    <div id="loc-idle" class="pane-body hidden">
+      <div class="analyze-prompt">
+        <p class="analyze-hint">Ready to analyze this Reel.</p>
+        <button class="analyze-btn" id="btn-analyze">▶ Analyze</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loc-loading" class="pane-body hidden">
+      <div class="loading-row">
+        <div class="spinner"></div>
+        <div class="load-text">
+          <div id="load-title" class="load-title">Analyzing video...</div>
+          <div id="load-sub"   class="load-sub">Reading signals</div>
+        </div>
+        <button class="stop-btn" id="btn-stop" title="Stop analysis">■ Stop</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="loc-result" class="pane-body hidden">
+      <div id="warn-banner" class="alert alert-amber hidden"></div>
+
+      <div id="signal-rows" class="signal-rows"></div>
+
+      <div id="result-card" class="result-card hidden">
+        <div id="result-name" class="result-place"></div>
+        <div id="result-sub"  class="result-sub"></div>
+        <div class="conf-wrap">
+          <div class="conf-labels">
+            <span>Confidence</span>
+            <span id="conf-pct">—</span>
+          </div>
+          <div class="conf-bar">
+            <div id="conf-fill" class="conf-fill"></div>
+          </div>
+        </div>
+        <div id="result-reasoning" class="result-reasoning hidden"></div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn"         id="btn-maps">Open in Maps</button>
+        <button class="btn primary" id="btn-similar">Similar places ↗</button>
+      </div>
+
+      <button class="deep-btn hidden" id="btn-deep">🔍 Run deep analysis</button>
+    </div>
+
+    <!-- Deep analysis running -->
+    <div id="loc-deep" class="pane-body hidden">
+      <div class="loading-row">
+        <div class="spinner"></div>
+        <div>
+          <div class="load-title">Running deep analysis...</div>
+          <div class="load-sub">Dense frames · audio transcription</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="loc-error" class="pane-body hidden">
+      <div class="error-box" id="error-msg"></div>
+      <button class="btn primary mt8 full-width" id="btn-retry">Retry</button>
+    </div>
+
+  </div><!-- /pane-location -->
+
+  <!-- ─── Ask Anything Pane ──────────────────────────────── -->
+  <div id="pane-ask" class="pane hidden">
+    <div class="ask-panel">
+
+      <div id="ask-idle" class="ask-idle-text">
+        Ask anything about this video — location, products, music, recipes, and more.
+      </div>
+
+      <div id="ask-answer-wrap" class="hidden">
+        <div class="answer-label">Answer</div>
+        <div class="answer-box" id="ask-answer"></div>
+        <div id="ask-products" class="hidden"></div>
+      </div>
+
+      <div id="ask-loading" class="hidden">
+        <div class="loading-row compact">
+          <div class="spinner sm"></div>
+          <span class="load-sub">Thinking...</span>
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <textarea id="ask-input" class="ask-input" placeholder="Ask anything about this video..." rows="2"></textarea>
+        <button class="send-btn" id="btn-send">→</button>
+      </div>
+
+      <div class="chips">
+        <button class="chip" data-q="Where is this place exactly?">Where is this?</button>
+        <button class="chip" data-q="What song is playing in this video?">Song playing?</button>
+        <button class="chip" data-q="What clothing or outfit is being worn? Where can I buy it?">Outfit & shop?</button>
+        <button class="chip" data-q="Give me the full recipe shown with ingredients and steps.">Recipe?</button>
+        <button class="chip" data-q="What camera or lens was used to film this?">Camera used?</button>
+        <button class="chip" data-q="How crowded is this place? What is the vibe like?">Crowd & vibe?</button>
+      </div>
+
+    </div>
+  </div><!-- /pane-ask -->
+
+</div><!-- /analysis-section -->
+
+<!-- ══════════════════════════════════════════════════════════
+     Offsite / browse notice (not on a reel/post/story)
+═══════════════════════════════════════════════════════════ -->
+<div id="offsite-notice" class="offsite-notice hidden">
+  <span class="offsite-icon">📍</span>
+  <span id="offsite-text">Navigate to an Instagram Reel, post, or story to analyze it.</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     History section  (always visible)
+═══════════════════════════════════════════════════════════ -->
+<div class="history-section">
+
+  <div class="history-header">
+    <div class="history-title-row">
+      <span class="history-title">History</span>
+      <span id="history-count" class="history-count"></span>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="history-search" class="history-search" placeholder="Search history...">
+      <button class="search-clear hidden" id="btn-search-clear">✕</button>
+    </div>
+  </div>
+
+  <div id="history-list" class="history-list"></div>
+
+</div>
+
+<script src="sidebar.js"></script>
+</body>
+</html>

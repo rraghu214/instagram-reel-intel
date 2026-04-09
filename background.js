@@ -5,6 +5,9 @@ const CLAUDE_MODEL  = 'claude-sonnet-4-6';
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
 const WHISPER_MODEL = 'whisper-1';
 
+// ── Sidebar: open on icon click ───────────────────────────────────────────────
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+
 // ── Message router ──────────────────────────────────────────────────────────
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   const handlers = {
@@ -53,14 +56,26 @@ async function analyzeLocation({ frames, metadata, isDeepAnalysis }) {
     throw new Error('No AI API key configured. Open Settings to add a Gemini or Claude key.');
   }
 
-  const maxFrames = isDeepAnalysis ? 20 : 8;
-  const trimmed   = (frames || []).slice(0, maxFrames);
+  // Fast-lane: if caption + location tag have enough signal, skip frame extraction
+  // and send text-only to the AI (cheaper + faster)
+  const hasRichText = metadata?.caption?.length > 30 || metadata?.locationTag;
+  const trimmed = (frames || []).slice(0, isDeepAnalysis ? 20 : 8);
+  const useTextOnly = hasRichText && trimmed.length === 0;
 
   const system  = locationSystemPrompt();
   const content = buildLocationContent(trimmed, metadata, isDeepAnalysis);
 
   const raw = await callAI(keys, system, content, 1024);
-  return parseJsonResponse(raw);
+  const result = parseJsonResponse(raw);
+
+  // If parse failed but we have a rich caption, annotate with what we know
+  if (result.parseError && hasRichText) {
+    result.signals = result.signals || {};
+    result.signals.caption = metadata?.caption?.slice(0, 100) || null;
+    result.signals.locationTag = metadata?.locationTag || null;
+  }
+
+  return result;
 }
 
 // ── Ask anything ─────────────────────────────────────────────────────────────
@@ -311,23 +326,10 @@ Confidence guide:
 20–49   Weak signals, educated guess only
 0–19    Genuinely unidentifiable
 
-Respond ONLY with a raw JSON object — no markdown fences, no extra commentary:
-{
-  "placeName": "Specific place name, or null if unknown",
-  "placeDetail": "City · Region · Country",
-  "placeType": "Category (e.g. Waterfall, Beach Café, Mountain Trail, Temple, Restaurant)",
-  "confidence": 0–100,
-  "withholdingLocation": true or false,
-  "withholdingPattern": "Exact phrase detected, or null",
-  "signals": {
-    "locationTag": "Tag text or null",
-    "caption": "Relevant caption excerpt or null",
-    "visual": "What frames showed — landmarks, signage, architecture, vegetation — or null",
-    "audio": "Place name heard in transcript, or null",
-    "comments": "Most relevant comment or null"
-  },
-  "reasoning": "1–2 sentence explanation of how you reached this conclusion"
-}`;
+IMPORTANT: Your entire response must be ONLY a JSON object. No markdown, no code fences, no explanation before or after. Start your response with { and end with }.
+
+Use exactly this structure:
+{"placeName":"Specific place name or null","placeDetail":"City · Region · Country","placeType":"Category","confidence":91,"withholdingLocation":false,"withholdingPattern":null,"signals":{"locationTag":"tag or null","caption":"excerpt or null","visual":"what frames showed or null","audio":"place name heard or null","comments":"relevant comment or null"},"reasoning":"1-2 sentence explanation"}`;
 }
 
 function askAnythingSystemPrompt() {
@@ -413,20 +415,37 @@ function buildAskContent(question, frames, metadata, transcript) {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function parseJsonResponse(text) {
-  const stripped = text.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
-  try {
-    const m = stripped.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('No JSON object found in response');
-    return JSON.parse(m[0]);
-  } catch (e) {
-    return {
-      placeName:   null,
-      placeDetail: 'Unable to parse Claude response',
-      confidence:  0,
-      error:       e.message,
-      raw:         text.slice(0, 400),
-    };
+  // Strip markdown fences if present
+  const stripped = text
+    .replace(/^```[\w]*\r?\n?/, '')
+    .replace(/\r?\n?```$/, '')
+    .trim();
+
+  // Try 1: parse the whole stripped string
+  try { return JSON.parse(stripped); } catch (_) {}
+
+  // Try 2: extract first {...} block (handles preamble/postamble text)
+  const m = stripped.match(/\{[\s\S]*\}/);
+  if (m) {
+    try { return JSON.parse(m[0]); } catch (_) {}
   }
+
+  // Try 3: find the largest {...} block in the raw text
+  const allBlocks = [...text.matchAll(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)?\}/g)];
+  for (const block of allBlocks.reverse()) { // largest first (reversed)
+    try { return JSON.parse(block[0]); } catch (_) {}
+  }
+
+  // Fallback: return a structured error so the UI shows something meaningful
+  return {
+    placeName:   null,
+    placeDetail: 'AI returned an unexpected response format — please retry.',
+    confidence:  0,
+    withholdingLocation: false,
+    signals:     {},
+    reasoning:   `Raw response: ${text.slice(0, 200)}`,
+    parseError:  true,
+  };
 }
 
 function dataUrlToBlob(dataUrl) {

@@ -1,12 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Reel Intel",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Video intelligence layer for Instagram Reels — instant answers about location, products, music, and more.",
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "tabs",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://www.instagram.com/*",
@@ -25,8 +27,10 @@
       "run_at": "document_idle"
     }
   ],
+  "side_panel": {
+    "default_path": "sidebar/sidebar.html"
+  },
   "action": {
-    "default_popup": "popup/panel.html",
     "default_title": "Reel Intel",
     "default_icon": {
       "16": "icons/icon16.png",

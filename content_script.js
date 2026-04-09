@@ -104,24 +104,42 @@ function getUrlType(url) {
 
 function extractCaption() {
   // Instagram's DOM changes frequently; try multiple selectors in priority order.
+  // Modal posts (/p/) have a different structure from fullscreen Reels.
   const selectors = [
+    // Modal post overlay — caption is in the comments section, first li
+    'article ul li:first-child span[dir="auto"]',
+    // Modal post — direct h1
     'article h1',
     'h1[dir="auto"]',
+    // Reel fullscreen caption
     'div[data-testid="post-comment-root"] span[dir="auto"]',
+    // Modal: description block
+    'div[role="dialog"] h1',
+    'div[role="dialog"] span[dir="auto"]',
+    // Generic article caption
     'article div[dir="auto"] span[dir="auto"]',
+    // Wide fallback — any dir=auto span (last resort)
     'span[dir="auto"]',
   ];
 
+  // Collect all candidates, then pick the longest one that looks like a caption
+  // (not just a username or a short label)
+  const candidates = [];
   for (const sel of selectors) {
     try {
       const els = document.querySelectorAll(sel);
       for (const el of els) {
         const text = el.textContent?.trim();
-        if (text && text.length > 5) return text;
+        if (text && text.length > 15) candidates.push(text);
       }
     } catch (_) {}
   }
-  return null;
+
+  if (!candidates.length) return null;
+
+  // Prefer the longest candidate — captions are typically longer than usernames
+  candidates.sort((a, b) => b.length - a.length);
+  return candidates[0];
 }
 
 function extractComments(captionText) {
