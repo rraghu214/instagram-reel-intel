@@ -108,13 +108,49 @@ async function handleTabChange(tab) {
 
   const contentId = extractContentId(url);
 
+  // On the home/reels feed (no specific content ID) — allow analysis of
+  // whatever video is currently visible; preserve result on tab switch-back.
   if (!contentId) {
-    showOffsiteNotice('Open a specific Reel, post, or story on Instagram.');
+    showAnalysisSection();
+    hide('cached-banner');
+    hide('nokey-notice');
+
+    // Returning to feed while analysis is still running — re-show loading UI
+    if (state.currentContentId === null && state.analysisRunning) {
+      showLocLoading('Analyzing video...', 'Please wait...');
+      return;
+    }
+    // Returning to feed with a completed result — restore it
+    if (state.currentContentId === null && state.analysisResult) {
+      showLocationResult(state.analysisResult);
+      return;
+    }
+
+    // Fresh feed visit (or came from a specific reel page)
+    state.currentContentId = null;
+    state.analysisResult   = null;
+    state.frames           = [];
+    state.transcript       = null;
+
+    const keys = await bg({ action: 'GET_KEYS' });
+    if (!keys.hasAiKey) { showNoKeyNotice(); return; }
+    showAnalyzePrompt();
     return;
   }
 
-  // Same content as currently shown — no need to re-analyze
-  if (contentId === state.currentContentId && state.analysisResult) return;
+  // Same content — restore UI instead of silently returning
+  if (contentId === state.currentContentId) {
+    showAnalysisSection();
+    if (state.analysisRunning) {
+      showLocLoading('Analyzing video...', 'Please wait...');
+      return;
+    }
+    if (state.analysisResult) {
+      showLocationResult(state.analysisResult);
+      return;
+    }
+  }
+
   state.currentContentId = contentId;
 
   // Check API key

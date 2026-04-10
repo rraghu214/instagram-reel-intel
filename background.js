@@ -2,7 +2,7 @@
 // Handles all external API calls: Gemini (default), Claude (fallback), Whisper, Google Maps.
 
 const CLAUDE_MODEL  = 'claude-sonnet-4-6';
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
 const WHISPER_MODEL = 'whisper-1';
 
 // ── Sidebar: open on icon click ───────────────────────────────────────────────
@@ -60,7 +60,6 @@ async function analyzeLocation({ frames, metadata, isDeepAnalysis }) {
   // and send text-only to the AI (cheaper + faster)
   const hasRichText = metadata?.caption?.length > 30 || metadata?.locationTag;
   const trimmed = (frames || []).slice(0, isDeepAnalysis ? 20 : 8);
-  const useTextOnly = hasRichText && trimmed.length === 0;
 
   const system  = locationSystemPrompt();
   const content = buildLocationContent(trimmed, metadata, isDeepAnalysis);
@@ -355,6 +354,7 @@ function buildLocationContent(frames, metadata, isDeepAnalysis) {
 
   const signals = [];
   if (metadata?.locationTag)         signals.push(`Instagram location tag: "${metadata.locationTag}"`);
+  if (metadata?.author)              signals.push(`Post author username: "@${metadata.author}" (may contain place/brand name)`);
   if (metadata?.caption)             signals.push(`Caption: "${metadata.caption}"`);
   if (metadata?.transcript)          signals.push(`Audio transcript: "${metadata.transcript}"`);
   if (metadata?.comments?.length) {

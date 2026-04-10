@@ -62,6 +62,7 @@ async function extractMetadata() {
     locationTag:  null,
     locationId:   null,
     locationHref: null,
+    author:       null,
     caption:      null,
     comments:     [],
     videoDuration: null,
@@ -76,6 +77,9 @@ async function extractMetadata() {
     const m = locLink.href.match(/\/explore\/locations\/(\d+)\//);
     if (m) meta.locationId = m[1];
   }
+
+  // ── Author username ──
+  meta.author = extractAuthor();
 
   // ── Caption ──
   meta.caption = extractCaption();
@@ -100,6 +104,29 @@ function getUrlType(url) {
   if (/\/p\//.test(url))             return 'post';
   if (/\/stories\//.test(url))       return 'story';
   return 'unknown';
+}
+
+function extractAuthor() {
+  // Try the header link of the active article/reel
+  const selectors = [
+    'article header a[href^="/"]',           // modal post / reel page
+    'div[role="dialog"] header a[href^="/"]', // dialog
+    'a[role="link"][href^="/"][tabindex="0"]', // feed reel header
+  ];
+  for (const sel of selectors) {
+    try {
+      const el = document.querySelector(sel);
+      if (el) {
+        const href = el.getAttribute('href') || '';
+        // href is like "/username/" — extract the username
+        const m = href.match(/^\/([^/?#]+)\/?$/);
+        if (m && m[1] !== 'explore' && m[1] !== 'reels') return m[1];
+        const text = el.textContent?.trim();
+        if (text && text.length > 1 && text.length < 40) return text;
+      }
+    } catch (_) {}
+  }
+  return null;
 }
 
 function extractCaption() {
@@ -168,7 +195,17 @@ function findBestVideo() {
   const videos = Array.from(document.querySelectorAll('video'));
   if (!videos.length) return null;
 
-  return videos.reduce((best, v) => {
+  // On the home feed multiple videos are loaded; the one currently playing
+  // is the one the user is watching — strongly prefer it.
+  const playing = videos.filter(v =>
+    !v.paused && v.readyState >= 2 && isFinite(v.duration) &&
+    v.getBoundingClientRect().height > 50
+  );
+  if (playing.length === 1) return playing[0];
+
+  // If multiple playing (rare) or none playing, pick by largest visible area.
+  const candidates = playing.length ? playing : videos;
+  return candidates.reduce((best, v) => {
     const rect     = v.getBoundingClientRect();
     const area     = rect.width * rect.height;
     const hasData  = v.readyState >= 1 && isFinite(v.duration);
