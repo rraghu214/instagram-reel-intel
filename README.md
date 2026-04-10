@@ -1,8 +1,8 @@
 # 🎬 Reel Intel
 
-<div align="center">
+<!-- <div align="center">
   <img src="instagram_intelligence_thumbnail.jpg" alt="Reel Intel — Instagram Intelligence" width="720"/>
-</div>
+</div> -->
 
 <br/>
 
@@ -16,10 +16,11 @@ Reel Intel is a Chrome extension that sits quietly in your browser sidebar and, 
 ## 🎥 Demo
 
 <div align="center">
-  <video src="Instagram-Reel-Intelligence-Demo.mp4" autoplay loop muted width="720"></video>
-  <br/>
-
-  ▶ [Click to watch the full demo on YouTube](https://youtu.be/b0J6FGu8FDM)
+  <a href="https://youtu.be/b0J6FGu8FDM" target="_blank">
+    <img src="instagram_intelligence_thumbnail.jpg" alt="Watch Reel Intel Demo on YouTube" width="720"/>
+  </a>
+  <br/><br/>
+  ▶ <a href="https://youtu.be/b0J6FGu8FDM"><strong>Click to watch the full demo on YouTube</strong></a>
 </div>
 
 ---
