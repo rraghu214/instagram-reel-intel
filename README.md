@@ -104,6 +104,62 @@ gemini-2.5-flash  ──► gemini-2.0-flash  ──► gemini-2.0-flash-lite  �
 
 ---
 
+## ⏱️ API Call Sequence
+
+Every time you hit **▶ Analyze**, here's exactly what fires and when:
+
+```
+USER HITS ANALYZE
+        │
+        ▼
+① content_script.js  ──  no API calls, instant
+   • Reads DOM: caption, location tag, author username, comments
+   • Finds the currently playing video
+   • Seeks to random timestamps → captures JPEG frames via Canvas
+        │
+        ▼
+② OpenAI Whisper  ──  runs in background, non-blocking
+   • Fetches the video blob from Instagram (uses page cookies)
+   • Sends to Whisper for speech-to-text transcription
+   • Transcript is added to the next AI round if it arrives in time
+   ⚠ Does NOT block the result from showing — runs in parallel
+        │
+        ▼
+③ Gemini API  ──  primary AI, called first
+   • Tries gemini-2.5-flash
+        │ 429 / 503 / 404?
+        ▼
+   • Tries gemini-2.0-flash
+        │ 429 / 503 / 404?
+        ▼
+   • Tries gemini-2.0-flash-lite
+        │ all three failed?
+        ▼
+④ Claude API  ──  fallback, only if all Gemini models fail
+   • Identical prompt, identical JSON output format
+   • Transparent to the user — result looks the same
+        │
+        ▼
+⑤ Result evaluated
+   • Confidence ≥ threshold → show result, done ✅
+   • Confidence < threshold → loop back to ③ with more frames
+   • Max 3 rounds of sampling before showing best result
+        │
+        ▼
+⑥ Google Maps API  ──  on-demand only, never called automatically
+   • "Open in Maps" clicked → Places API resolves name to place_id
+   • "Similar places" clicked → Places API text search nearby
+```
+
+### Key things to note
+- **Step ① is free** — pure DOM reading + Canvas, no network calls
+- **Step ② runs in parallel** — Whisper never delays your result
+- **Steps ③→④ are a waterfall** — Claude only activates if all Gemini models are unavailable
+- **Step ⑥ is optional** — Maps API is never called unless you click a button
+- **The loop (③→⑤) runs up to 3 times** — each round adds 8 more frames for stubborn locations
+
+---
+
 ## 🛠️ Installation
 
 Reel Intel is a **developer extension** — you load it directly from the source folder. No Chrome Web Store required.
