@@ -899,20 +899,20 @@ async function handleSimilarPlaces() {
   try {
     const response = await bg({ action: 'GET_SIMILAR_PLACES', placeName: result.placeName, placeType: result.placeType });
     const q = encodeURIComponent(`${result.placeType || 'places'} near ${result.placeName}`);
-    chrome.tabs.create({ url: response.fallbackUrl || `https://www.google.com/maps/search/?api=1&query=${q}` });
+    chrome.tabs.create({ url: response.fallbackUrl || `https://www.google.com/maps/search/?api=1&query=${q}`, active: false });
   } catch (_) {
     const q = encodeURIComponent(`${result.placeType || 'places'} similar to ${result.placeName}`);
-    chrome.tabs.create({ url: `https://www.google.com/maps/search/?api=1&query=${q}` });
+    chrome.tabs.create({ url: `https://www.google.com/maps/search/?api=1&query=${q}`, active: false });
   }
 }
 
 async function openMapsForResult(result) {
   try {
     const resolved = await bg({ action: 'RESOLVE_PLACE', placeName: result.placeName, placeDetail: result.placeDetail });
-    if (resolved.url) chrome.tabs.create({ url: resolved.url });
+    if (resolved.url) chrome.tabs.create({ url: resolved.url, active: false });
   } catch (_) {
     const q = encodeURIComponent(`${result.placeName}${result.placeDetail ? ', ' + result.placeDetail : ''}`);
-    chrome.tabs.create({ url: `https://www.google.com/maps/search/?api=1&query=${q}` });
+    chrome.tabs.create({ url: `https://www.google.com/maps/search/?api=1&query=${q}`, active: false });
   }
 }
 
