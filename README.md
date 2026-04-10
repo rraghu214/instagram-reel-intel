@@ -1,9 +1,26 @@
 # 🎬 Reel Intel
 
+<div align="center">
+  <img src="instagram_intelligence_thumbnail.jpg" alt="Reel Intel — Instagram Intelligence" width="720"/>
+</div>
+
+<br/>
+
 > **The AI-powered intelligence layer for Instagram Reels.**
 > Scroll your feed. Hit Analyze. Know everything.
 
 Reel Intel is a Chrome extension that sits quietly in your browser sidebar and, on demand, tells you *everything* about any Instagram Reel — where it was filmed, what's in it, what song is playing, what outfit the creator is wearing, and more. Powered by Google Gemini (free) with Claude as a smart fallback.
+
+---
+
+## 🎥 Demo
+
+<div align="center">
+  <video src="Instagram-Reel-Intelligence-Demo.mp4" autoplay loop muted width="720"></video>
+  <br/>
+
+  ▶ [Click to watch the full demo on YouTube](https://youtu.be/b0J6FGu8FDM)
+</div>
 
 ---
 
